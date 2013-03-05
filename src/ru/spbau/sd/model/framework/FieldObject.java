@@ -31,24 +31,17 @@ import java.util.Map;
  * @author Artur Huletski (hatless.fox@gmail.com)
  *
  */
-abstract public class FieldObject {
+abstract public class FieldObject extends GameObject{
 
     private InteractionHandlers mIntHandlers = new InteractionHandlers();
     
     public FieldObject(int x, int y) {
-        mX = x;
-        mY = y;
+        super(x, y);
     }
     
-    private int mX;
-    public int getX() { return mX; }
-    
-    private int mY;
-    public int getY() { return mY; }
-    
     public void setNewPosition(int x, int y) {
-        mX = x;
-        mY = y;
+        setX(x);
+        setY(y);
     }
     
     /**
@@ -75,12 +68,7 @@ abstract public class FieldObject {
             mIntHandlers.getHandler(obj.getClass()).performInteraction(this, obj);
         }
     }
-    
-    /**
-     * Returns object description as a single character
-     * @return
-     */
-    abstract public char getSingleCharDescription(); 
+
     
     //container for interaction handlers
     private static class InteractionHandlers {

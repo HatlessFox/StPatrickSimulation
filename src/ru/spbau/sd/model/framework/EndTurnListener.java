@@ -20,55 +20,16 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd;
-
-import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.game.Column;
-import ru.spbau.sd.model.game.Drinker;
-import ru.spbau.sd.model.game.Tavern;
-import ru.spbau.sd.view.FileldConsoleWriter;
-
-/*
- * Light
- * 
- * ---X---
- * -XXXXX-
- * -XXXXX-
- * XXXXXXX
- * -XXXXX-
- * -XXXXX-
- * ---X---
- * 
- */
-
+package ru.spbau.sd.model.framework;
 
 /**
- * Main app class
+ * Interface listener that somehow handle end turn event
  * 
  * @author Artur Huletski (hatless.fox@gmail.com)
- *
  */
-public class Main {
-
-    private static final int NUMBER_OF_TRIALS = 200;
-    
-    public static void main(String[] args) {
-        //Setting up game stuff
-        Field.init(15, 15);
-        
-        Field.getInstance().addMovable(new Drinker(0, 0));
-        Field.getInstance().addStationary(new Column(7, 7));
-        Field.getInstance().addOutside(new Tavern(-1, 7, 20));
-        
-        for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
-            Field.getInstance().simulateRound();
-            FileldConsoleWriter.printField();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
-        }
-        FileldConsoleWriter.printField();
-    }
-
+public interface EndTurnListener {
+    /**
+     * Handles end of turn
+     */
+    public void handleEndTurn();
 }

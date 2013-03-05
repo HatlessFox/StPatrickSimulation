@@ -20,55 +20,43 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd;
+package ru.spbau.sd.model.game;
 
+import ru.spbau.sd.model.framework.EndTurnListener;
 import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.game.Column;
-import ru.spbau.sd.model.game.Drinker;
-import ru.spbau.sd.model.game.Tavern;
-import ru.spbau.sd.view.FileldConsoleWriter;
+import ru.spbau.sd.model.framework.GameObject;
+import ru.spbau.sd.model.framework.Point2D;
 
-/*
- * Light
- * 
- * ---X---
- * -XXXXX-
- * -XXXXX-
- * XXXXXXX
- * -XXXXX-
- * -XXXXX-
- * ---X---
- * 
- */
-
-
-/**
- * Main app class
- * 
- * @author Artur Huletski (hatless.fox@gmail.com)
- *
- */
-public class Main {
-
-    private static final int NUMBER_OF_TRIALS = 200;
+public class Tavern extends GameObject implements EndTurnListener {
     
-    public static void main(String[] args) {
-        //Setting up game stuff
-        Field.init(15, 15);
+    public Tavern(int x, int y, int genInt) {
+        super(x, y);
+        mEntryX = Math.max(x, 0);
+        mEntryY = Math.max(y, 0);
+        mGenInt = genInt;
         
-        Field.getInstance().addMovable(new Drinker(0, 0));
-        Field.getInstance().addStationary(new Column(7, 7));
-        Field.getInstance().addOutside(new Tavern(-1, 7, 20));
-        
-        for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
-            Field.getInstance().simulateRound();
-            FileldConsoleWriter.printField();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+        Field.getInstance().addEndTurnListener(this);
+    }
+    
+    private int mEntryX;
+    private int mEntryY;
+    private int mGenInt;
+    private int mElapsed;
+    
+    @Override
+    public void handleEndTurn() {
+        mElapsed += 1;
+        if (mGenInt == mElapsed) {
+            mElapsed = 0;
+            if (Field.getInstance().isPosFree(new Point2D(mEntryX, mEntryY))) {
+                Field.getInstance().addMovable(new Drinker(mEntryX, mEntryY));
             }
         }
-        FileldConsoleWriter.printField();
+    }
+
+    @Override
+    public char getSingleCharDescription() {
+        return 'T';
     }
 
 }

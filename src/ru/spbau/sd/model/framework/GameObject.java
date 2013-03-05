@@ -20,55 +20,29 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd;
+package ru.spbau.sd.model.framework;
 
-import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.game.Column;
-import ru.spbau.sd.model.game.Drinker;
-import ru.spbau.sd.model.game.Tavern;
-import ru.spbau.sd.view.FileldConsoleWriter;
-
-/*
- * Light
- * 
- * ---X---
- * -XXXXX-
- * -XXXXX-
- * XXXXXXX
- * -XXXXX-
- * -XXXXX-
- * ---X---
- * 
- */
-
-
-/**
- * Main app class
- * 
- * @author Artur Huletski (hatless.fox@gmail.com)
- *
- */
-public class Main {
-
-    private static final int NUMBER_OF_TRIALS = 200;
-    
-    public static void main(String[] args) {
-        //Setting up game stuff
-        Field.init(15, 15);
-        
-        Field.getInstance().addMovable(new Drinker(0, 0));
-        Field.getInstance().addStationary(new Column(7, 7));
-        Field.getInstance().addOutside(new Tavern(-1, 7, 20));
-        
-        for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
-            Field.getInstance().simulateRound();
-            FileldConsoleWriter.printField();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
-        }
-        FileldConsoleWriter.printField();
+public abstract class GameObject {
+    public GameObject(int x, int y) {
+        mX = x;
+        mY = y;
     }
-
+    
+    private int mX;
+    public int getX() { return mX; }
+    protected void setX(int x) { mX = x; }
+    
+    private int mY;
+    public int getY() { return mY; }
+    protected void setY(int y) { mY = y; }
+    
+    public boolean isOnSamePosition(Point2D pos) {
+        return getX() == pos.x && getY() == pos.y;
+    }
+    
+    /**
+     * Returns object description as a single character
+     * @return
+     */
+    abstract public char getSingleCharDescription(); 
 }

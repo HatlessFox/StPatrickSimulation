@@ -42,19 +42,14 @@ public class MovementManager {
     
     public static MovementManager getInstance() { return sInstance; }
     
-    //checks if point lies on field
-    private boolean isInsideField(Point2D point) {
-        return (0 <= point.x) && (point.x < Field.getInstance().getXBound()) &&
-               (0 <= point.y) && (point.y < Field.getInstance().getYBound());
-    }
     
     //plain implementation. doesn't handle multi-causal rounds of movements (per single time tick)
     public void handleMovements(Map<MovableObject, Point2D> movementInfo) {
         if (movementInfo.size() == 0) { return; }
         
         List<FieldObject> stationaryObjects = new ArrayList<>();
-        for (FieldObject fo : Field.getInstance().getAllObjects()) {
-          if (!movementInfo.containsKey(fo) || !isInsideField(movementInfo.get(fo))) {
+        for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
+          if (!movementInfo.containsKey(fo) || !Field.getInstance().isInsideField(movementInfo.get(fo))) {
             stationaryObjects.add(fo);
             movementInfo.remove(fo);
           }
@@ -71,7 +66,7 @@ public class MovementManager {
     //updates actor's position
     private void handleCollisions(MovableObject actor, Point2D newPosition, List<FieldObject> stationaryObjects) {
         for (FieldObject sfo : stationaryObjects) {
-            if (sfo.getX() == newPosition.x && sfo.getY() == newPosition.y) {
+            if (sfo.isOnSamePosition(newPosition)) {
                 actor.interact(sfo);
                 return;
             }

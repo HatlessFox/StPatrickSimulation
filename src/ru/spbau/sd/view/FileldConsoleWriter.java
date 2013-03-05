@@ -24,6 +24,7 @@ package ru.spbau.sd.view;
 
 import ru.spbau.sd.model.framework.Field;
 import ru.spbau.sd.model.framework.FieldObject;
+import ru.spbau.sd.model.framework.GameObject;
 
 /**
  * Prints field to console
@@ -33,20 +34,26 @@ import ru.spbau.sd.model.framework.FieldObject;
 public class FileldConsoleWriter {
 
     public static void printField() {
-        char filedProg[][] = new char[Field.getInstance().getXBound()][Field.getInstance().getYBound()]; 
+        char filedProg[][] = new char[Field.getInstance().getXBound()+2][Field.getInstance().getYBound()+2]; 
         
-        for (int i = 0; i < Field.getInstance().getXBound(); i++) {
-            for (int j = 0; j < Field.getInstance().getYBound(); j ++) {
-                filedProg[i][j] = '.';
+        //round rectangle is for outer objects
+        for (int i = -1; i < Field.getInstance().getXBound() + 1; i++) {
+            for (int j = -1; j < Field.getInstance().getYBound() + 1; j ++) {
+                filedProg[i+1][j+1] = Field.getInstance().isInsideField(i, j) ? '.' : ' ';
+                
             }
         }
         
-        for (FieldObject fo : Field.getInstance().getAllObjects()) {
-            filedProg[fo.getX()][fo.getY()] = fo.getSingleCharDescription();
+        
+        for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
+            filedProg[fo.getX()+1][fo.getY()+1] = fo.getSingleCharDescription();
+        }
+        for (GameObject go : Field.getInstance().getOutsideObjects()) {
+            filedProg[go.getX()+1][go.getY()+1] = go.getSingleCharDescription();
         }
         
-        for (int i = 0; i < Field.getInstance().getXBound(); i++) {
-            for (int j = 0; j < Field.getInstance().getYBound(); j ++) {
+        for (int i = 0; i < Field.getInstance().getXBound()+2; i++) {
+            for (int j = 0; j < Field.getInstance().getYBound()+2; j ++) {
                 System.out.print(filedProg[i][j]);
             }
             System.out.println();

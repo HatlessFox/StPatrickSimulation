@@ -23,6 +23,7 @@
 package ru.spbau.sd.model.framework;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +59,32 @@ public class Field {
     private List<MovableObject> mMovableObjects = new ArrayList<MovableObject>();
     //objects that can't move
     private List<FieldObject> mStationaryObjects = new ArrayList<FieldObject>();
+    //end turn listeners
+    private List<EndTurnListener> mEndTurnListenrs = new ArrayList<>();
+    //outside objects
+    private List<GameObject> mOutsideObjects = new ArrayList<>();
+    
     
     public void addMovable(MovableObject movable) { mMovableObjects.add(movable); }
     public void addStationary(FieldObject stat) { mStationaryObjects.add(stat); }
+    public void addEndTurnListener(EndTurnListener etl) { mEndTurnListenrs.add(etl); }
+    public void addOutside(GameObject etl) { mOutsideObjects.add(etl); }
+    
+    //checks if point lies on field
+    public boolean isInsideField(Point2D point) {
+        return isInsideField(point.x, point.y);
+    }
+    public boolean isInsideField(int x, int y) {
+        return (0 <= x) && (x < getXBound()) &&
+               (0 <= y) && (y < getYBound());
+    }
+    
+    public boolean isPosFree(Point2D pos) {
+        for (FieldObject fo : getAllFieldObjects()) {
+            if (fo.isOnSamePosition(pos)) { return false; }
+        }
+        return true;
+    }
     
     /**
      * Performs 'time tick'
@@ -76,6 +100,10 @@ public class Field {
         
         //handle movements
         MovementManager.getInstance().handleMovements(cmds);
+        //notify listeners
+        for (EndTurnListener etl : mEndTurnListenrs) {
+            etl.handleEndTurn();
+        }
     }
     
     /**
@@ -83,11 +111,16 @@ public class Field {
      * 
      * @return
      */
-    public List<FieldObject> getAllObjects() {
+    public List<FieldObject> getAllFieldObjects() {
         //caching if this is performance bottle neck
         List<FieldObject> result = new ArrayList<FieldObject>();
         result.addAll(mStationaryObjects);
         result.addAll(mMovableObjects);
         return result;
     }
+    
+    public List<GameObject> getOutsideObjects() {
+        return Collections.unmodifiableList(mOutsideObjects);
+    }
+    
 }
