@@ -24,6 +24,7 @@ package ru.spbau.sd.model.game;
 
 import java.util.Random;
 
+import ru.spbau.sd.model.framework.Field;
 import ru.spbau.sd.model.framework.FieldObject;
 import ru.spbau.sd.model.framework.InteractionStrategy;
 import ru.spbau.sd.model.framework.MovableObject;
@@ -31,6 +32,8 @@ import ru.spbau.sd.model.framework.Point2D;
 
 public class Drinker extends MovableObject {
 
+    private Bottle bottle = new Bottle(-1, -1);
+    private Random rnd = new Random();
     
     //drinker's movement strategies
     private enum MovementStrategy {
@@ -39,6 +42,16 @@ public class Drinker extends MovableObject {
           public Point2D makeMove(FieldObject obj) { 
               return new Point2D(obj.getX(), obj.getY());
           }
+
+          @Override public char getSingleCharRepr() { return 'Z'; }
+        },
+        LAYING {
+          @Override
+          public Point2D makeMove(FieldObject obj) { 
+            return new Point2D(obj.getX(), obj.getY());
+          }
+
+          @Override public char getSingleCharRepr() { return '&'; }
         },
         ALIVE {
           private Random rnd = new Random();
@@ -54,13 +67,15 @@ public class Drinker extends MovableObject {
               
               return newPos;
           }
+          @Override
+          public char getSingleCharRepr() { return 'D'; }
         };
         
         abstract public Point2D makeMove(FieldObject obj);
+        abstract public char getSingleCharRepr();
     }
     
     private MovementStrategy mMovementStr = MovementStrategy.ALIVE;
-    private int mTimeToSleep = 0;
     
     public Drinker(int x, int y) {
         super(x,y);
@@ -68,32 +83,56 @@ public class Drinker extends MovableObject {
           new InteractionStrategy<Drinker, Column>() {
             @Override
             public void performInteraction(Drinker obj1, Column obj2) {
-                obj1.interactWithColumn(obj2);
+                obj1.mMovementStr =  MovementStrategy.SLEEP;
             }
           }
         );
+        registerInteractionHandler(Drinker.class, Bottle.class,
+           new InteractionStrategy<Drinker, Bottle>() {
+             @Override
+             public void performInteraction(Drinker obj1, Bottle obj2) {
+               mMovementStr = MovementStrategy.LAYING;
+             }
+           }
+        );
+        registerInteractionHandler(Drinker.class, Drinker.class,
+                new InteractionStrategy<Drinker, Drinker>() {
+                  @Override
+                  public void performInteraction(Drinker obj1, Drinker buddy) {
+                      if (buddy.mMovementStr == MovementStrategy.SLEEP) {
+                          mMovementStr = MovementStrategy.SLEEP;
+                      }
+                      //LAYING -- do nothing
+                      //ALIVE -- it's bang, so do nothing
+                  }
+                }
+        );
+        //policemen, light -- do nothing so no reasons for register
     }
-    
-    private void interactWithColumn(Column obj2) {
-        mTimeToSleep = 5;
-        mMovementStr = MovementStrategy.SLEEP;
-    }
+
     
     @Override
     protected Point2D calcNextPos() {
         Point2D newPos = mMovementStr.makeMove(this);
-        if (mMovementStr == MovementStrategy.SLEEP) {
-            if (--mTimeToSleep == 0) {
-                mMovementStr = MovementStrategy.ALIVE;
-            }
-        }
         
         return newPos;
     }
     
     @Override
     public char getSingleCharDescription() {
-        return (mMovementStr == MovementStrategy.ALIVE) ? 'D' : 'Z';
+        return mMovementStr.getSingleCharRepr();
+    }
+    
+    
+    @Override
+    public void setNewPosition(int x, int y) {
+        if (bottle != null && rnd.nextInt(30) == 0) {
+            bottle.setNewPosition(getX(), getY());
+            Field.getInstance().addStationary(bottle);
+            bottle = null;
+        }
+        
+        super.setNewPosition(x,y);
     }
     
 }

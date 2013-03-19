@@ -39,6 +39,13 @@ abstract public class FieldObject extends GameObject{
         super(x, y);
     }
     
+    /**
+     * It's guaranteed that this method will be called
+     * only on actual position change
+     * 
+     * @param x
+     * @param y
+     */
     public void setNewPosition(int x, int y) {
         setX(x);
         setY(y);

@@ -20,37 +20,13 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd.model.framework;
+package ru.spbau.sd.model.game;
 
-/**
- * A value type that represents a point.Since its is a pure pair, data is public
- * 
- * @author Artur Huletski (hatless.fox@gmail.com)
- *
- */
-public class Point2D implements Cloneable {
-    
-    public int x;
-    public int y;
+import ru.spbau.sd.model.framework.FieldObject;
 
-    public Point2D(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-    
-    @Override
-    public int hashCode() {
-        return (x << 16) & (y & 0x0000FFFF);
-    }
-    
-    @Override
-    public boolean equals(Object that) {
-        if (!(that instanceof Point2D)) { return false; }
-        Point2D p = (Point2D)this;
-        return (x == p.x) && (y == p.y);
-    }
-    
-    @Override
-    public Point2D clone() { return new Point2D(x, y); }
-    
+public class Bottle extends FieldObject {
+
+    public Bottle(int x, int y) { super(x, y); }
+    @Override public char getSingleCharDescription() { return 'B'; }
+
 }
