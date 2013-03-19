@@ -25,21 +25,10 @@ package ru.spbau.sd;
 import ru.spbau.sd.model.framework.Field;
 import ru.spbau.sd.model.game.Column;
 import ru.spbau.sd.model.game.Drinker;
+import ru.spbau.sd.model.game.Light;
+import ru.spbau.sd.model.game.PoliceStation;
 import ru.spbau.sd.model.game.Tavern;
 import ru.spbau.sd.view.FileldConsoleWriter;
-
-/*
- * Light
- * 
- * ---X---
- * -XXXXX-
- * -XXXXX-
- * XXXXXXX
- * -XXXXX-
- * -XXXXX-
- * ---X---
- * 
- */
 
 
 /**
@@ -58,7 +47,9 @@ public class Main {
         
         Field.getInstance().addMovable(new Drinker(0, 0));
         Field.getInstance().addStationary(new Column(7, 7));
-        Field.getInstance().addOutside(new Tavern(-1, 7, 20));
+        Field.getInstance().addOutside(new Tavern(9, -1, 20));
+        Field.getInstance().addStationary(new Light(10, 3));
+        Field.getInstance().addOutside(new PoliceStation(15, 3, 1));
         
         for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
             Field.getInstance().simulateRound();

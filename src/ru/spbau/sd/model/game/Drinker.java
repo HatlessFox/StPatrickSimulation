@@ -36,7 +36,7 @@ public class Drinker extends MovableObject {
     private Random rnd = new Random();
     
     //drinker's movement strategies
-    private enum MovementStrategy {
+    public static enum MovementStrategy {
         SLEEP {
           @Override
           public Point2D makeMove(FieldObject obj) { 
@@ -76,6 +76,7 @@ public class Drinker extends MovableObject {
     }
     
     private MovementStrategy mMovementStr = MovementStrategy.ALIVE;
+    public MovementStrategy getMovementStrategy() { return mMovementStr; }
     
     public Drinker(int x, int y) {
         super(x,y);
@@ -126,7 +127,9 @@ public class Drinker extends MovableObject {
     
     @Override
     public void setNewPosition(int x, int y) {
-        if (bottle != null && rnd.nextInt(30) == 0) {
+        boolean bottleIsThrowable = 
+          mMovementStr == MovementStrategy.ALIVE && bottle != null;
+        if (bottleIsThrowable && rnd.nextInt(30) == 0) {
             bottle.setNewPosition(getX(), getY());
             Field.getInstance().addStationary(bottle);
             bottle = null;
