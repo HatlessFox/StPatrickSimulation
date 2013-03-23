@@ -22,6 +22,8 @@
 
 package ru.spbau.sd.model.game;
 
+import ru.spbau.sd.model.framework.Field;
+import ru.spbau.sd.model.framework.InteractionStrategy;
 import ru.spbau.sd.model.framework.MovableObject;
 import ru.spbau.sd.model.framework.Point2D;
 
@@ -29,37 +31,48 @@ public class Policeman extends MovableObject {
 
     private Drinker mBadGuy;
     private boolean mBadGuyIsCaught;
+    private boolean mIsGoingHome;
     private PoliceStation mPoliceStation;
+
+    public boolean isGoingHome() { return mIsGoingHome; }
+    public boolean isBadGuyCaught() { return mBadGuyIsCaught; }
+    public Drinker getCatchedBadGuy() { return mBadGuy; }
     
     public Policeman(int x, int y, PoliceStation ps) {
         super(x, y);
         mPoliceStation = ps;
+        registerInteractionHandler(Policeman.class, Drinker.class,
+          new InteractionStrategy<Policeman, Drinker>() {
+            @Override
+            public void performInteraction(Policeman obj1, Drinker drinker) {
+                if (drinker == mBadGuy) {
+                    Field.getInstance().removeMovable(mBadGuy);
+                    setNewPosition(mBadGuy.getX(), mBadGuy.getY());
+                    mIsGoingHome = mBadGuyIsCaught = true;
+                }
+            }
+          }
+       );
     }
-
-    public boolean isBadGuyCaught() { return mBadGuyIsCaught; }
-    public Drinker getCatchedBadGuy() { return mBadGuy; }
     
     public void recieveCatchOrder(Drinker newBadGuy) {
         mBadGuy = newBadGuy;
-        mBadGuyIsCaught = false;
+        mIsGoingHome = mBadGuyIsCaught = false;
     }
 
     
     @Override
     protected Point2D calcNextPos() {
         Point2D destPoint = isBadGuyCaught() ?
-          new Point2D(mPoliceStation.getEntryX(), mPoliceStation.getEntryY()) :
-          new Point2D(mBadGuy.getX(), mBadGuy.getY());
-
-        return GameUtils.lookUpNextStep(new Point2D(getX(), getY()), destPoint);
-    }
-    
-    @Override
-    public void setNewPosition(int x, int y) {
-        if (isBadGuyCaught()) {
-            mBadGuy.setNewPosition(getX(), getY());
+           new Point2D(mPoliceStation.getEntryX(), mPoliceStation.getEntryY()) :
+           new Point2D(mBadGuy.getX(), mBadGuy.getY());
+       
+        Point2D policemanPos = new Point2D(getX(), getY());
+        Point2D nextStep = GameUtils.lookUpNextStep(policemanPos, destPoint);
+        if (nextStep.equals(policemanPos)) {
+            mIsGoingHome = true; //can't catch bad guy -- going home
         }
-        super.setNewPosition(x, y);
+        return nextStep;
     }
     
     @Override

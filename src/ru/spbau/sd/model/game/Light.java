@@ -36,7 +36,7 @@ public class Light extends FieldObject {
     }
   
     /*
-     * Lighted cover
+     * Light cover
      * 
      * ---X---
      * -XXXXX-

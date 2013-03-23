@@ -46,7 +46,7 @@ public class Point2D implements Cloneable {
     @Override
     public boolean equals(Object that) {
         if (!(that instanceof Point2D)) { return false; }
-        Point2D p = (Point2D)this;
+        Point2D p = (Point2D)that;
         return (x == p.x) && (y == p.y);
     }
     

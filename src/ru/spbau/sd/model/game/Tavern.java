@@ -31,8 +31,8 @@ public class Tavern extends GameObject implements EndTurnListener {
     
     public Tavern(int x, int y, int genInt) {
         super(x, y);
-        mEntryX = Math.max(x, 0);
-        mEntryY = Math.max(y, 0);
+        mEntryX = Math.min(Math.max(x, 0), Field.getInstance().getXBound() - 1);
+        mEntryY = Math.min(Math.max(y, 0), Field.getInstance().getYBound() - 1);
         mGenInt = genInt;
         
         Field.getInstance().addEndTurnListener(this);

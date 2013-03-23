@@ -61,11 +61,12 @@ public class PoliceStation extends GameObject implements EndTurnListener {
     private void processReturnedOfficers() {
         for (Policeman p : walkingOfficers) {
             if (!p.isOnSamePosition(mEntryPoint)) { continue; }
-            
-            if (!p.isBadGuyCaught()) { break; }
+            if (!p.isGoingHome()) { break; }
             
             //remove policeman and drinker from the field
-            Field.getInstance().removeMovable(p.getCatchedBadGuy());
+            if (p.isBadGuyCaught()) {
+                Field.getInstance().removeMovable(p.getCatchedBadGuy());
+            }
             Field.getInstance().removeMovable(p);
             
             //policeman is waiting for next drinker
@@ -76,15 +77,22 @@ public class PoliceStation extends GameObject implements EndTurnListener {
     }
     
     private boolean drinkerShouldBeCaught(Drinker d) {
+        if (drinkersToBeCaught.contains(d)) { return false; }
         return d.getMovementStrategy() == Drinker.MovementStrategy.LAYING ||
                d.getMovementStrategy() == Drinker.MovementStrategy.SLEEP;
     }
     
+    private boolean drinkerIsReachable(Drinker d) {
+        return !mEntryPoint.equals(GameUtils.lookUpNextStep(mEntryPoint, new Point2D(d.getX(), d.getY())));
+    }
+    
     private void processUncaughtDrinkers() {
         if (waitingOfficers.size() == 0) { return; }
+        if (!Field.getInstance().isPosFree(mEntryPoint)) { return; }
         
         Drinker drinkerToBeCaught = null;
         for (FieldObject fo_stat : Field.getInstance().getAllFieldObjects()) {
+            //our informer is light. If other object will be informers -- create interface
             if (!fo_stat.getClass().equals(Light.class)) { continue; }
             
             Light l = (Light) fo_stat; 
@@ -92,7 +100,7 @@ public class PoliceStation extends GameObject implements EndTurnListener {
                 if (!fo.getClass().equals(Drinker.class)) { continue; }
                 Drinker d = (Drinker) fo;
                 
-                if (!drinkersToBeCaught.contains(d) && drinkerShouldBeCaught(d)) {
+                if (drinkerShouldBeCaught(d) && drinkerIsReachable(d)) {
                     drinkerToBeCaught = d;
                     break;
                 }
@@ -101,12 +109,12 @@ public class PoliceStation extends GameObject implements EndTurnListener {
         if (drinkerToBeCaught == null) { return; }
         
         Policeman p = waitingOfficers.remove(waitingOfficers.size() - 1);
-        walkingOfficers.add(p);
-        p.recieveCatchOrder(drinkerToBeCaught);
-        drinkersToBeCaught.add(drinkerToBeCaught);
         
+        drinkersToBeCaught.add(drinkerToBeCaught);
+        p.recieveCatchOrder(drinkerToBeCaught);
         p.setNewPosition(mEntryX, mEntryY);
         Field.getInstance().addMovable(p);
+        walkingOfficers.add(p);
     }
     
     

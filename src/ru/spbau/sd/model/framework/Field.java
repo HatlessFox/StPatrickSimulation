@@ -80,6 +80,16 @@ public class Field {
                (0 <= y) && (y < getYBound());
     }
     
+    public static boolean arePointsNear(int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x1 - x2);
+        int dy = Math.abs(y1 - y2);
+        return dx * dy == 0 && (dx == 1 || dy == 1);
+    }
+    
+    public static boolean arePointsNear(Point2D p1, Point2D p2) {
+        return arePointsNear(p1.x, p1.y, p2.x, p2.y);
+    }
+    
     public boolean isPosFree(Point2D pos) {
         for (FieldObject fo : getAllFieldObjects()) {
             if (fo.isOnSamePosition(pos)) { return false; }
@@ -101,12 +111,13 @@ public class Field {
         
         //handle movements
         MovementManager.getInstance().handleMovements(cmds);
-        //notify listeners
+    }
+    
+    public void handleEndTurn() {
         for (EndTurnListener etl : mEndTurnListenrs) {
             etl.handleEndTurn();
         }
     }
-    
     /**
      * Returns list of all object that are on field at a given time<br/>
      * 

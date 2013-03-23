@@ -22,13 +22,116 @@
 
 package ru.spbau.sd.model.game;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
+import ru.spbau.sd.model.framework.Field;
+import ru.spbau.sd.model.framework.FieldObject;
 import ru.spbau.sd.model.framework.Point2D;
 
 final public class GameUtils {
     private GameUtils() {}
     
+    
+    private static int [][] getMap() {
+        int x_dem = Field.getInstance().getXBound();
+        int y_dem = Field.getInstance().getYBound();
+        
+        int[][] map = new int[x_dem][y_dem];
+        
+        for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
+            map[fo.getX()][fo.getY()] = Integer.MAX_VALUE;
+        }
+        return map;
+    }
+
+    private static abstract class NeighborHandler {
+        public int[][] map;
+        public int x;
+        public int y;
+        
+        public NeighborHandler(int[][] pMap) {
+            map = pMap;
+        }
+        abstract void handleNeighbor(int i, int y);
+    }
+    
+    private static class CommonBfsNeighborHandler extends NeighborHandler {
+        public Queue<Integer> q;
+        public CommonBfsNeighborHandler(Queue<Integer> pQ, int[][] pMap) {
+          super(pMap);
+          q = pQ;
+        }
+        
+        public void setCurrentCoord(int pX, int pY) {
+            x = pX;
+            y = pY;
+        }
+        @Override
+        void handleNeighbor(int i, int j) {
+            if (map[i][j] != 0) { return; }
+             
+            map[i][j] = map[x][y] + 1;
+            q.add(i);
+            q.add(j);
+        }
+        
+    }
+    
+    private static class DestinationNeighborHandler extends NeighborHandler {
+        public Point2D next_step = null;
+        public DestinationNeighborHandler(int[][] pMap, Point2D point) {
+            super(pMap);
+            x = point.x;
+            y = point.y;
+        }
+        
+        @Override
+        void handleNeighbor(int i, int j) {
+            if (map[i][j] + 1 == map[x][y]) {
+                next_step =  new Point2D(i, j);
+            }
+        }
+        
+    }
+    
+    private static void processNeighbors(NeighborHandler nh) {
+        for (int i = nh.x - 1; i < nh.x + 2; i++) {
+            for (int j = nh.y - 1; j < nh.y + 2; j++) {
+                if (!Field.arePointsNear(i, j, nh.x, nh.y)) { continue; }
+                if (!Field.getInstance().isInsideField(i, j)) { continue; }
+                nh.handleNeighbor(i, j);
+            }
+        }
+    }
+        
     public static Point2D lookUpNextStep(Point2D start, Point2D end) {
-        //TODO BFS
-        return start;
+        if (Field.arePointsNear(start, end)) { return end; }
+        
+        int[][] map = getMap();
+        map[start.x][start.y] = 0; 
+        map[end.x][end.y] = 0;
+        
+        Queue<Integer> points_to_go = new LinkedList<>();
+        points_to_go.add(end.x);
+        points_to_go.add(end.y);
+        
+        CommonBfsNeighborHandler bfsH = new CommonBfsNeighborHandler(points_to_go, map);
+        DestinationNeighborHandler destH = new DestinationNeighborHandler(map, start);
+        
+        while (!points_to_go.isEmpty()) {
+            int curr_x = points_to_go.poll();
+            int curr_y = points_to_go.poll();
+            
+            if (curr_x == start.x && curr_y == start.y) {
+                processNeighbors(destH);
+                break;
+            }
+            
+            bfsH.setCurrentCoord(curr_x, curr_y);
+            processNeighbors(bfsH);
+        }
+        
+        return destH.next_step == null ? start : destH.next_step;
     }
 }

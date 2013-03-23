@@ -22,6 +22,9 @@
 
 package ru.spbau.sd;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import ru.spbau.sd.model.framework.Field;
 import ru.spbau.sd.model.game.Column;
 import ru.spbau.sd.model.game.Drinker;
@@ -39,7 +42,14 @@ import ru.spbau.sd.view.FileldConsoleWriter;
  */
 public class Main {
 
-    private static final int NUMBER_OF_TRIALS = 200;
+    private static final int NUMBER_OF_TRIALS = 500;
+    
+    private static Set<Integer> sTrialsToBeShown = new HashSet<>();
+    static {
+//        sTrialsToBeShown.add(200);
+//        sTrialsToBeShown.add(300);
+//        sTrialsToBeShown.add(500);
+    }
     
     public static void main(String[] args) {
         //Setting up game stuff
@@ -51,12 +61,25 @@ public class Main {
         Field.getInstance().addStationary(new Light(10, 3));
         Field.getInstance().addOutside(new PoliceStation(15, 3, 1));
         
+        // More fun
+        Field.getInstance().addStationary(new Light(12, 5));
+        Field.getInstance().addMovable(new Drinker(10, 2));
+        Field.getInstance().addStationary(new Column(10, 4));
+        Field.getInstance().addOutside(new Tavern(15, 7, 5));
+        
+        
         for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
             Field.getInstance().simulateRound();
-            FileldConsoleWriter.printField();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+            if (sTrialsToBeShown.isEmpty() || sTrialsToBeShown.contains(i)) {
+                FileldConsoleWriter.printField();
+            }
+            
+            if (sTrialsToBeShown.isEmpty()) {
+                Field.getInstance().handleEndTurn();
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                }
             }
         }
         FileldConsoleWriter.printField();

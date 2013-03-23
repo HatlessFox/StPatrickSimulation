@@ -37,12 +37,12 @@ public class Drinker extends MovableObject {
     
     //drinker's movement strategies
     public static enum MovementStrategy {
+        
         SLEEP {
           @Override
           public Point2D makeMove(FieldObject obj) { 
               return new Point2D(obj.getX(), obj.getY());
           }
-
           @Override public char getSingleCharRepr() { return 'Z'; }
         },
         LAYING {
@@ -50,7 +50,6 @@ public class Drinker extends MovableObject {
           public Point2D makeMove(FieldObject obj) { 
             return new Point2D(obj.getX(), obj.getY());
           }
-
           @Override public char getSingleCharRepr() { return '&'; }
         },
         ALIVE {
@@ -97,38 +96,32 @@ public class Drinker extends MovableObject {
            }
         );
         registerInteractionHandler(Drinker.class, Drinker.class,
-                new InteractionStrategy<Drinker, Drinker>() {
-                  @Override
-                  public void performInteraction(Drinker obj1, Drinker buddy) {
-                      if (buddy.mMovementStr == MovementStrategy.SLEEP) {
-                          mMovementStr = MovementStrategy.SLEEP;
-                      }
-                      //LAYING -- do nothing
-                      //ALIVE -- it's bang, so do nothing
-                  }
+          new InteractionStrategy<Drinker, Drinker>() {
+            @Override
+            public void performInteraction(Drinker obj1, Drinker buddy) {
+                if (buddy.mMovementStr == MovementStrategy.SLEEP) {
+                    mMovementStr = MovementStrategy.SLEEP;
                 }
-        );
-        //policemen, light -- do nothing so no reasons for register
+                //LAYING -- do nothing
+                //ALIVE -- it's bang, so do nothing
+            }
+        }
+       );
+       //policemen, light -- do nothing so no reasons for register
     }
-
     
     @Override
-    protected Point2D calcNextPos() {
-        Point2D newPos = mMovementStr.makeMove(this);
-        
-        return newPos;
-    }
+    protected Point2D calcNextPos() { return mMovementStr.makeMove(this); }
     
     @Override
     public char getSingleCharDescription() {
         return mMovementStr.getSingleCharRepr();
     }
     
-    
     @Override
     public void setNewPosition(int x, int y) {
         boolean bottleIsThrowable = 
-          mMovementStr == MovementStrategy.ALIVE && bottle != null;
+                mMovementStr == MovementStrategy.ALIVE && bottle != null;
         if (bottleIsThrowable && rnd.nextInt(30) == 0) {
             bottle.setNewPosition(getX(), getY());
             Field.getInstance().addStationary(bottle);
