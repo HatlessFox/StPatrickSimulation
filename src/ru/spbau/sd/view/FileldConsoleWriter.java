@@ -40,7 +40,6 @@ public class FileldConsoleWriter {
         for (int i = -1; i < Field.getInstance().getXBound() + 1; i++) {
             for (int j = -1; j < Field.getInstance().getYBound() + 1; j ++) {
                 filedProg[i+1][j+1] = Field.getInstance().isInsideField(i, j) ? '.' : ' ';
-                
             }
         }
         

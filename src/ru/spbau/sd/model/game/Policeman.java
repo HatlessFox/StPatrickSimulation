@@ -30,6 +30,8 @@ import ru.spbau.sd.model.framework.Point2D;
 public class Policeman extends MovableObject {
 
     private Drinker mBadGuy;
+    
+    //here are 2flags. If one more will be added consider refactoring to state pattern
     private boolean mBadGuyIsCaught;
     private boolean mIsGoingHome;
     private PoliceStation mPoliceStation;
@@ -60,14 +62,33 @@ public class Policeman extends MovableObject {
         mIsGoingHome = mBadGuyIsCaught = false;
     }
 
+    private boolean shouldWait() {
+        //guy that going home has less priority
+        if (!isGoingHome()) { return false; }
+        for (Policeman colleague : mPoliceStation.getWalkingOfficers()) {
+            if (Field.areNear(this, colleague) && !colleague.isGoingHome()) {
+                return true;
+            }
+        }
+            
+        return false;
+    }
+    
     
     @Override
     protected Point2D calcNextPos() {
-        Point2D destPoint = isBadGuyCaught() ?
+        Point2D policemanPos = new Point2D(getX(), getY());
+
+        //this code is to prevent livelock
+        //live lock is possible when one policeman goes home and another one for bad guy
+        // is some conditions
+        if (shouldWait()) { return policemanPos; }
+        
+        
+        Point2D destPoint = isBadGuyCaught() || isGoingHome() ?
            new Point2D(mPoliceStation.getEntryX(), mPoliceStation.getEntryY()) :
            new Point2D(mBadGuy.getX(), mBadGuy.getY());
        
-        Point2D policemanPos = new Point2D(getX(), getY());
         Point2D nextStep = GameUtils.lookUpNextStep(policemanPos, destPoint);
         if (nextStep.equals(policemanPos)) {
             mIsGoingHome = true; //can't catch bad guy -- going home

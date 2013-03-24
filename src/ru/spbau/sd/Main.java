@@ -46,9 +46,9 @@ public class Main {
     
     private static Set<Integer> sTrialsToBeShown = new HashSet<>();
     static {
-//        sTrialsToBeShown.add(200);
-//        sTrialsToBeShown.add(300);
-//        sTrialsToBeShown.add(500);
+        sTrialsToBeShown.add(22);
+        sTrialsToBeShown.add(300);
+        sTrialsToBeShown.add(500);
     }
     
     public static void main(String[] args) {
@@ -59,30 +59,30 @@ public class Main {
         Field.getInstance().addStationary(new Column(7, 7));
         Field.getInstance().addOutside(new Tavern(9, -1, 20));
         Field.getInstance().addStationary(new Light(10, 3));
-        Field.getInstance().addOutside(new PoliceStation(15, 3, 1));
+        Field.getInstance().addOutside(new PoliceStation(15, 3, 1));//3));
         
         // More fun
-        Field.getInstance().addStationary(new Light(12, 5));
-        Field.getInstance().addMovable(new Drinker(10, 2));
-        Field.getInstance().addStationary(new Column(10, 4));
-        Field.getInstance().addOutside(new Tavern(15, 7, 5));
+//        Field.getInstance().addStationary(new Light(12, 6));
+//        Field.getInstance().addMovable(new Drinker(10, 2));
+//        Field.getInstance().addStationary(new Column(10, 4));
+//        Field.getInstance().addOutside(new Tavern(15, 7, 5));
+//        Field.getInstance().addOutside(new Tavern(15, 10, 5));
         
         
-        for (int i = 0; i < NUMBER_OF_TRIALS; i++) {
+        for (int i = 1; i <= NUMBER_OF_TRIALS; i++) {
             Field.getInstance().simulateRound();
             if (sTrialsToBeShown.isEmpty() || sTrialsToBeShown.contains(i)) {
                 FileldConsoleWriter.printField();
             }
+            Field.getInstance().handleEndTurn();
             
             if (sTrialsToBeShown.isEmpty()) {
-                Field.getInstance().handleEndTurn();
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                 }
             }
         }
-        FileldConsoleWriter.printField();
     }
 
 }

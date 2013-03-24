@@ -23,6 +23,7 @@
 package ru.spbau.sd.model.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,16 +36,17 @@ import ru.spbau.sd.model.framework.Point2D;
 
 public class PoliceStation extends GameObject implements EndTurnListener {
 
-    private List<Policeman> waitingOfficers = new ArrayList<>();
-    private List<Policeman> walkingOfficers = new ArrayList<>();
-    private Set<Drinker> drinkersToBeCaught = new HashSet<>();
+    private List<Policeman> mWaitingOfficers = new ArrayList<>();
+    private List<Policeman> mWalkingOfficers = new ArrayList<>();
+    private Set<Drinker> mDrinkersToBeCaught = new HashSet<>();
+    
+    private Policeman mJustReturnedOfficer;
     
     private int mEntryX;
     public int getEntryX() { return mEntryX; }
     private int mEntryY;
     public int getEntryY() { return mEntryY; }
     private Point2D mEntryPoint;
-
     
     public PoliceStation(int x, int y, int officersCnt) {
         super(x, y);
@@ -52,17 +54,22 @@ public class PoliceStation extends GameObject implements EndTurnListener {
         mEntryY = Math.min(Math.max(y, 0), Field.getInstance().getYBound() - 1);
         mEntryPoint = new Point2D(mEntryX, mEntryY);
         for (int i = 0; i < officersCnt; i++) {
-            waitingOfficers.add(new Policeman(-1, -1, this));
+            mWaitingOfficers.add(new Policeman(-1, -1, this));
         }
         
         Field.getInstance().addEndTurnListener(this);
     }
     
+    public List<Policeman> getWalkingOfficers() {
+        return Collections.unmodifiableList(mWalkingOfficers);
+    }
+    
     private void processReturnedOfficers() {
-        for (Policeman p : walkingOfficers) {
+        for (Policeman p : mWalkingOfficers) {
             if (!p.isOnSamePosition(mEntryPoint)) { continue; }
             if (!p.isGoingHome()) { break; }
             
+            mDrinkersToBeCaught.remove(p.getCatchedBadGuy());
             //remove policeman and drinker from the field
             if (p.isBadGuyCaught()) {
                 Field.getInstance().removeMovable(p.getCatchedBadGuy());
@@ -70,14 +77,14 @@ public class PoliceStation extends GameObject implements EndTurnListener {
             Field.getInstance().removeMovable(p);
             
             //policeman is waiting for next drinker
-            walkingOfficers.remove(p);
-            waitingOfficers.add(p);
+            mWalkingOfficers.remove(p);
+            mJustReturnedOfficer = p;
             break;
         }
     }
     
     private boolean drinkerShouldBeCaught(Drinker d) {
-        if (drinkersToBeCaught.contains(d)) { return false; }
+        if (mDrinkersToBeCaught.contains(d)) { return false; }
         return d.getMovementStrategy() == Drinker.MovementStrategy.LAYING ||
                d.getMovementStrategy() == Drinker.MovementStrategy.SLEEP;
     }
@@ -87,7 +94,7 @@ public class PoliceStation extends GameObject implements EndTurnListener {
     }
     
     private void processUncaughtDrinkers() {
-        if (waitingOfficers.size() == 0) { return; }
+        if (mWaitingOfficers.size() == 0) { return; }
         if (!Field.getInstance().isPosFree(mEntryPoint)) { return; }
         
         Drinker drinkerToBeCaught = null;
@@ -108,13 +115,13 @@ public class PoliceStation extends GameObject implements EndTurnListener {
         }
         if (drinkerToBeCaught == null) { return; }
         
-        Policeman p = waitingOfficers.remove(waitingOfficers.size() - 1);
+        Policeman p = mWaitingOfficers.remove(mWaitingOfficers.size() - 1);
         
-        drinkersToBeCaught.add(drinkerToBeCaught);
+        mDrinkersToBeCaught.add(drinkerToBeCaught);
         p.recieveCatchOrder(drinkerToBeCaught);
         p.setNewPosition(mEntryX, mEntryY);
         Field.getInstance().addMovable(p);
-        walkingOfficers.add(p);
+        mWalkingOfficers.add(p);
     }
     
     
@@ -122,6 +129,12 @@ public class PoliceStation extends GameObject implements EndTurnListener {
     public void handleEndTurn() {
         processReturnedOfficers();
         processUncaughtDrinkers();
+        
+        //usability. Policeman has to step into Station when returned
+        if (mJustReturnedOfficer != null) {
+            mWaitingOfficers.add(mJustReturnedOfficer);
+            mJustReturnedOfficer = null;
+        }
     }
 
     @Override

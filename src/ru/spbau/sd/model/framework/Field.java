@@ -86,6 +86,10 @@ public class Field {
         return dx * dy == 0 && (dx == 1 || dy == 1);
     }
     
+    public static boolean areNear(GameObject go1, GameObject go2) {
+        return arePointsNear(go1.getX(), go1.getY(), go2.getX(), go2.getY());
+    }
+    
     public static boolean arePointsNear(Point2D p1, Point2D p2) {
         return arePointsNear(p1.x, p1.y, p2.x, p2.y);
     }
