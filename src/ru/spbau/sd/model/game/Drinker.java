@@ -111,7 +111,7 @@ public class Drinker extends MovableObject {
     }
     
     @Override
-    protected Point2D calcNextPos() { return mMovementStr.makeMove(this); }
+    public Point2D move() { return mMovementStr.makeMove(this); }
     
     @Override
     public char getSingleCharDescription() {

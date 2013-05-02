@@ -24,12 +24,7 @@ package ru.spbau.sd.model.framework;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import ru.spbau.sd.model.framework.movement.MovementCommand;
-import ru.spbau.sd.model.framework.movement.MovementManager;
 
 /**
  * Instance of a game field.
@@ -96,26 +91,38 @@ public class Field {
     }
     
     public boolean isPosFree(Point2D pos) {
-        for (FieldObject fo : getAllFieldObjects()) {
-            if (fo.isOnSamePosition(pos)) { return false; }
-        }
-        return true;
+        return getObjectOnPos(pos) == null;
     }
+    
+    public FieldObject getObjectOnPos(Point2D pos) {
+        for (FieldObject fo : getAllFieldObjects()) {
+            if (fo.isOnSamePosition(pos)) { return fo; }
+        }
+        return null;
+    }
+    
     
     /**
      * Performs 'time tick'
      */
     public void simulateRound() {
-        Map<MovableObject, Point2D> cmds = new HashMap<>(mMovableObjects.size());
-        for (MovableObject movable : mMovableObjects) {
-            MovementCommand cmd = movable.move();
-            if (!cmd.isStationary()) {
-                cmds.put(cmd.actor, cmd.newPosition);
+        List<MovableObject> movableSnapshot = new ArrayList<>(mMovableObjects);
+        //iterate over snapshot since some interactions can modify movable list
+        for (MovableObject movable : movableSnapshot) {
+            Point2D nextPosition = movable.move();
+            if (!isInsideField(nextPosition) || movable.isOnSamePosition(nextPosition)) {
+                continue;
             }
+            
+            FieldObject fo = getObjectOnPos(nextPosition);
+            
+            if (fo == null) {
+                movable.setNewPosition(nextPosition.x, nextPosition.y);
+            } else {
+                movable.interact(fo);
+            }
+            
         }
-        
-        //handle movements
-        MovementManager.getInstance().handleMovements(cmds);
     }
     
     public void handleEndTurn() {

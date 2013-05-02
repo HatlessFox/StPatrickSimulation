@@ -76,7 +76,7 @@ public class Policeman extends MovableObject {
     
     
     @Override
-    protected Point2D calcNextPos() {
+    public Point2D move() {
         Point2D policemanPos = new Point2D(getX(), getY());
 
         //this code is to prevent livelock

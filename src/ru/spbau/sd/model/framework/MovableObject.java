@@ -22,8 +22,6 @@
 
 package ru.spbau.sd.model.framework;
 
-import ru.spbau.sd.model.framework.movement.MovementCommand;
-
 /**
  * Represents first object that can be moved
  * 
@@ -33,18 +31,10 @@ import ru.spbau.sd.model.framework.movement.MovementCommand;
 public abstract class MovableObject extends FieldObject {
     
     //determines position to which object will move next turn
-    abstract protected Point2D calcNextPos();
+    abstract public Point2D move();
     
     public MovableObject(int x, int y) {
         super(x, y);
     }
     
-    /**
-     * Calculates next movement
-     * 
-     * @return instance of {@link MovementCommand} that represents move action
-     */
-    public MovementCommand move() {
-        return new MovementCommand(this, calcNextPos());
-    }
 }
