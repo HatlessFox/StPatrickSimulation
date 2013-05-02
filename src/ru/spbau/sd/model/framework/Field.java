@@ -68,6 +68,7 @@ public class Field {
     public void addMovable(MovableObject movable) { mMovableObjects.add(movable); }
     public void removeMovable(MovableObject movable) { mMovableObjects.remove(movable); }
     public void addStationary(FieldObject stat) { mStationaryObjects.add(stat); }
+    public void removeStationary(FieldObject stat) { mStationaryObjects.remove(stat); }
     public void addEndTurnListener(EndTurnListener etl) { mEndTurnListenrs.add(etl); }
     public void addOutside(GameObject etl) { mOutsideObjects.add(etl); }
     

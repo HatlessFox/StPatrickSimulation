@@ -22,8 +22,10 @@
 
 package ru.spbau.sd.model.game;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 import ru.spbau.sd.model.framework.Field;
 import ru.spbau.sd.model.framework.FieldObject;
@@ -33,13 +35,16 @@ final public class GameUtils {
     private GameUtils() {}
     
     
-    private static int [][] getMap() {
+    private static int [][] getMap(Class<?>... ignoredObstacles) {
         int x_dem = Field.getInstance().getXBound();
         int y_dem = Field.getInstance().getYBound();
         
         int[][] map = new int[x_dem][y_dem];
+        Set<Class<?>> ignoredObst = new HashSet<Class<?>>();
+        for (Class<?> obstClass : ignoredObstacles) { ignoredObst.add(obstClass); }
         
         for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
+            if (ignoredObst.contains(fo.getClass())) { continue; }
             map[fo.getX()][fo.getY()] = Integer.MAX_VALUE;
         }
         return map;
@@ -105,10 +110,10 @@ final public class GameUtils {
         }
     }
         
-    public static Point2D lookUpNextStep(Point2D start, Point2D end) {
+    public static Point2D lookUpNextStep(Point2D start, Point2D end, Class<?>... ignoredObstacles) {
         if (Field.arePointsNear(start, end)) { return end; }
         
-        int[][] map = getMap();
+        int[][] map = getMap(ignoredObstacles);
         map[start.x][start.y] = 0; 
         map[end.x][end.y] = 0;
         
