@@ -42,7 +42,7 @@ public class SquareFieldGeometry implements FieldGeometry{
     public Point2D getNeighborByDir(int dir, int baseX, int baseY) {
         dir = dir % getNeighborCnt();
         int newX = baseX + (dir < 2 ? 1 : -1) * (dir % 2);
-        int newY = baseY + (dir < 2 ? 1 : -1) * (dir % 2);
+        int newY = baseY + (dir < 2 ? 1 : -1) * ((dir + 1)% 2);
         return new Point2D(newX, newY);
     }
 
