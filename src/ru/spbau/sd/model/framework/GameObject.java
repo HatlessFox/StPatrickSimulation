@@ -40,6 +40,8 @@ public abstract class GameObject {
         return getX() == pos.x && getY() == pos.y;
     }
     
+    public Point2D getPosition() { return new Point2D(getX(), getY()); }
+    
     /**
      * Returns object description as a single character
      * @return

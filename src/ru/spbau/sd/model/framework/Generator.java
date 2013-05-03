@@ -20,46 +20,44 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd.model.game;
+package ru.spbau.sd.model.framework;
 
-import ru.spbau.sd.model.framework.EndTurnListener;
-import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.framework.Generator;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MumperHouse extends Generator implements EndTurnListener {
+public abstract class Generator extends GameObject {
 
-    private Mumper mumperOut = null;
-    private int delay;
-    private int turnsToGo = 0;
+    private List<Point2D> entryPoints = new ArrayList<>();
+    protected List<Point2D> getEntryPoints() { return entryPoints; }
     
-    public MumperHouse(int x, int y, int delay) {
+    public Generator(int x, int y) {
         super(x, y);
-        this.delay = delay;
         
-        Field.getInstance().addEndTurnListener(this);
-    }
-    
-    @Override
-    public void handleEndTurn() {
-        if (mumperOut == null) {
-            if (turnsToGo == 0) {
-                mumperOut = new Mumper(0, 0, getPosition());
-                if (!tryAddMovable(mumperOut)) { mumperOut = null; }
-            } else {
-                turnsToGo--;
-            }
-        } else {
-            if (getEntryPoints().contains(mumperOut.getPosition()) && mumperOut.hasBottleBeenFound()) {
-                Field.getInstance().removeMovable(mumperOut);
-                turnsToGo = delay;
-                mumperOut = null;
+        FieldGeometry fg = Field.getInstance().getGeometry();
+        for (int i = 0; i < fg.getNeighborCnt(); i++) {
+            Point2D entryPoint = fg.getNeighborByDir(i, x, y);
+            if (Field.getInstance().isInsideField(entryPoint)) {
+                entryPoints.add(entryPoint);
             }
         }
     }
-
-    @Override
-    public char getSingleCharDescription() {
-        return 'H';
+    
+    protected boolean tryAddMovable(MovableObject movable) {
+        for (Point2D ep : entryPoints) {
+            if (Field.getInstance().isPosFree(ep)) {
+                movable.setNewPosition(ep);
+                Field.getInstance().addMovable(movable);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    protected boolean isBlocked() {
+        for (Point2D ep : entryPoints) {
+            if (Field.getInstance().isPosFree(ep)) { return false; }
+        }
+        return true;
     }
 
 }

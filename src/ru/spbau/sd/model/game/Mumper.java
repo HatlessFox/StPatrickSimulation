@@ -39,8 +39,7 @@ public class Mumper extends MovableObject {
   
   public Mumper(int x, int y, Point2D homeSweetHome) {
       super(x, y);
-      x = 2;y = 8;
-      tmpDest = new Point2D(3, 5);
+
       mumperHouse = homeSweetHome;
       registerInteractionHandler(Mumper.class, Bottle.class,
           new InteractionStrategy<Mumper, Bottle>() {
@@ -56,7 +55,7 @@ public class Mumper extends MovableObject {
   @Override
   public Point2D move() {
       Point2D nextStep = null;
-      Point2D mumperPos = new Point2D(getX(), getY());
+      Point2D mumperPos = getPosition();
       Point2D destPoint = mumperHouse;
       
       if (isLookingForBottle) {

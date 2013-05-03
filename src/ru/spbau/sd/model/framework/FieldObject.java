@@ -51,6 +51,12 @@ abstract public class FieldObject extends GameObject{
         setY(y);
     }
     
+    public void setNewPosition(Point2D point) {
+        setX(point.x);
+        setY(point.y);
+    }
+    
+    
     /**
      * Registers interaction handler which will be called when given object
      * will be an initiator of collision with object of type typeOfObject.

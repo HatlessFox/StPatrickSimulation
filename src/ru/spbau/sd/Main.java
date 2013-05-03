@@ -64,16 +64,17 @@ public class Main {
         Field.getInstance().addMovable(new Drinker(0, 0));
         Field.getInstance().addStationary(new Column(7, 7));
         Field.getInstance().addOutside(new Tavern(9, -1, 20));
-        Field.getInstance().addStationary(new Light(10, 3));
-        Field.getInstance().addOutside(new PoliceStation(15, 3, 1));//3));
+        Field.getInstance().addStationary(new Light(10, 3, 3));
+        Field.getInstance().addOutside(new PoliceStation(15, 3, 3));//1));
         Field.getInstance().addOutside(new MumperHouse(-1, 4, 30));
         
         // More fun
-//        Field.getInstance().addStationary(new Light(12, 6));
-//        Field.getInstance().addMovable(new Drinker(10, 2));
-//        Field.getInstance().addStationary(new Column(10, 4));
-//        Field.getInstance().addOutside(new Tavern(15, 7, 5));
-//        Field.getInstance().addOutside(new Tavern(15, 10, 5));
+        Field.getInstance().addStationary(new Light(12, 7,3));
+        Field.getInstance().addMovable(new Drinker(10, 2));
+        Field.getInstance().addStationary(new Column(10, 4));
+        Field.getInstance().addOutside(new Tavern(15, 7, 5));
+        Field.getInstance().addOutside(new Tavern(15, 10, 5));
+        Field.getInstance().addOutside(new MumperHouse(15, 13, 20));
         
         
         for (int i = 1; i <= NUMBER_OF_TRIALS; i++) {

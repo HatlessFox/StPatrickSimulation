@@ -42,14 +42,14 @@ public class Drinker extends MovableObject {
         SLEEP {
           @Override
           public Point2D makeMove(FieldObject obj) { 
-              return new Point2D(obj.getX(), obj.getY());
+              return obj.getPosition();
           }
           @Override public char getSingleCharRepr() { return 'Z'; }
         },
         LAYING {
           @Override
           public Point2D makeMove(FieldObject obj) { 
-            return new Point2D(obj.getX(), obj.getY());
+            return obj.getPosition();
           }
           @Override public char getSingleCharRepr() { return '&'; }
         },
@@ -76,16 +76,16 @@ public class Drinker extends MovableObject {
         registerInteractionHandler(Drinker.class, Column.class,
           new InteractionStrategy<Drinker, Column>() {
             @Override
-            public void performInteraction(Drinker obj1, Column obj2) {
-                obj1.mMovementStr =  MovementStrategy.SLEEP;
+            public void performInteraction(Drinker drinker, Column column) {
+                drinker.mMovementStr =  MovementStrategy.SLEEP;
             }
           }
         );
         registerInteractionHandler(Drinker.class, Bottle.class,
            new InteractionStrategy<Drinker, Bottle>() {
              @Override
-             public void performInteraction(Drinker obj1, Bottle obj2) {
-               mMovementStr = MovementStrategy.LAYING;
+             public void performInteraction(Drinker d, Bottle b) {
+                 mMovementStr = MovementStrategy.LAYING;
              }
            }
         );

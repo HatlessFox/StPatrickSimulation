@@ -31,10 +31,10 @@ import java.util.Set;
 import ru.spbau.sd.model.framework.EndTurnListener;
 import ru.spbau.sd.model.framework.Field;
 import ru.spbau.sd.model.framework.FieldObject;
-import ru.spbau.sd.model.framework.GameObject;
+import ru.spbau.sd.model.framework.Generator;
 import ru.spbau.sd.model.framework.Point2D;
 
-public class PoliceStation extends GameObject implements EndTurnListener {
+public class PoliceStation extends Generator implements EndTurnListener {
 
     private List<Policeman> mWaitingOfficers = new ArrayList<>();
     private List<Policeman> mWalkingOfficers = new ArrayList<>();
@@ -42,17 +42,9 @@ public class PoliceStation extends GameObject implements EndTurnListener {
     
     private Policeman mJustReturnedOfficer;
     
-    private int mEntryX;
-    public int getEntryX() { return mEntryX; }
-    private int mEntryY;
-    public int getEntryY() { return mEntryY; }
-    private Point2D mEntryPoint;
-    
     public PoliceStation(int x, int y, int officersCnt) {
         super(x, y);
-        mEntryX = Math.min(Math.max(x, 0), Field.getInstance().getXBound() - 1);
-        mEntryY = Math.min(Math.max(y, 0), Field.getInstance().getYBound() - 1);
-        mEntryPoint = new Point2D(mEntryX, mEntryY);
+        
         for (int i = 0; i < officersCnt; i++) {
             mWaitingOfficers.add(new Policeman(-1, -1, this));
         }
@@ -66,7 +58,7 @@ public class PoliceStation extends GameObject implements EndTurnListener {
     
     private void processReturnedOfficers() {
         for (Policeman p : mWalkingOfficers) {
-            if (!p.isOnSamePosition(mEntryPoint)) { continue; }
+            if (!getEntryPoints().contains(p.getPosition())) { continue; }
             if (!p.isGoingHome()) { break; }
             
             mDrinkersToBeCaught.remove(p.getCatchedBadGuy());
@@ -89,15 +81,21 @@ public class PoliceStation extends GameObject implements EndTurnListener {
                d.getMovementStrategy() == Drinker.MovementStrategy.SLEEP;
     }
     
-    private boolean drinkerIsReachable(Drinker d) {
-        return !mEntryPoint.equals(GameUtils.lookUpNextStep(mEntryPoint, new Point2D(d.getX(), d.getY())));
+    private Point2D drinkerIsReachable(Drinker d) {
+        for (Point2D ep : getEntryPoints()) {
+            if (!ep.equals(GameUtils.lookUpNextStep(ep, d.getPosition()))) {
+                return ep;
+            }
+        }
+        return null;
     }
     
     private void processUncaughtDrinkers() {
         if (mWaitingOfficers.size() == 0) { return; }
-        if (!Field.getInstance().isPosFree(mEntryPoint)) { return; }
+        if (isBlocked()) { return; }
         
         Drinker drinkerToBeCaught = null;
+        Point2D choosenEntryPoint = null;
         for (FieldObject fo_stat : Field.getInstance().getAllFieldObjects()) {
             //our informer is light. If other object will be informers -- create interface
             if (!fo_stat.getClass().equals(Light.class)) { continue; }
@@ -107,7 +105,8 @@ public class PoliceStation extends GameObject implements EndTurnListener {
                 if (!fo.getClass().equals(Drinker.class)) { continue; }
                 Drinker d = (Drinker) fo;
                 
-                if (drinkerShouldBeCaught(d) && drinkerIsReachable(d)) {
+                choosenEntryPoint = drinkerIsReachable(d);
+                if (drinkerShouldBeCaught(d) && choosenEntryPoint != null) {
                     drinkerToBeCaught = d;
                     break;
                 }
@@ -119,7 +118,8 @@ public class PoliceStation extends GameObject implements EndTurnListener {
         
         mDrinkersToBeCaught.add(drinkerToBeCaught);
         p.recieveCatchOrder(drinkerToBeCaught);
-        p.setNewPosition(mEntryX, mEntryY);
+        
+        p.setNewPosition(choosenEntryPoint);
         Field.getInstance().addMovable(p);
         mWalkingOfficers.add(p);
     }

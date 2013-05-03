@@ -30,14 +30,17 @@ import ru.spbau.sd.model.framework.FieldObject;
 
 public class Light extends FieldObject {
 
-    public Light(int x, int y) {
+    private int radius;
+    
+    public Light(int x, int y, int rad) {
         super(x, y);
+        radius = rad;
     }
 
     public List<FieldObject> getLightedFieldObjects() {
         List<FieldObject> lightedObjects = new ArrayList<>();
         for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
-            if (Field.getInstance().getGeometry().isInsideCircle(getX(), getY(), 3, fo)) {
+            if (Field.getInstance().getGeometry().isInsideCircle(getX(), getY(), radius, fo)) {
                 lightedObjects.add(fo);
             }
         }

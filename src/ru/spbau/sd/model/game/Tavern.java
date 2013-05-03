@@ -24,22 +24,17 @@ package ru.spbau.sd.model.game;
 
 import ru.spbau.sd.model.framework.EndTurnListener;
 import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.framework.GameObject;
-import ru.spbau.sd.model.framework.Point2D;
+import ru.spbau.sd.model.framework.Generator;
 
-public class Tavern extends GameObject implements EndTurnListener {
+public class Tavern extends Generator implements EndTurnListener {
     
     public Tavern(int x, int y, int genInt) {
         super(x, y);
-        mEntryX = Math.min(Math.max(x, 0), Field.getInstance().getXBound() - 1);
-        mEntryY = Math.min(Math.max(y, 0), Field.getInstance().getYBound() - 1);
         mGenInt = genInt;
         
         Field.getInstance().addEndTurnListener(this);
     }
     
-    private int mEntryX;
-    private int mEntryY;
     private int mGenInt;
     private int mElapsed;
     
@@ -48,9 +43,7 @@ public class Tavern extends GameObject implements EndTurnListener {
         mElapsed += 1;
         if (mGenInt == mElapsed) {
             mElapsed = 0;
-            if (Field.getInstance().isPosFree(new Point2D(mEntryX, mEntryY))) {
-                Field.getInstance().addMovable(new Drinker(mEntryX, mEntryY));
-            }
+            tryAddMovable(new Drinker(0, 0));
         }
     }
 

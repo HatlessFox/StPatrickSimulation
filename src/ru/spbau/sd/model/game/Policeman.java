@@ -77,11 +77,11 @@ public class Policeman extends MovableObject {
     
     @Override
     public Point2D move() {
-        Point2D policemanPos = new Point2D(getX(), getY());
+        Point2D policemanPos = getPosition();
 
         //this code is to prevent livelock
         //live lock is possible when one policeman goes home and another one for bad guy
-        // is some conditions
+        // in some conditions
         if (shouldWait()) { return policemanPos; }
         
         
