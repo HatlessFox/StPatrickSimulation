@@ -20,30 +20,21 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd.model.game;
+package ru.spbau.sd.field.sq;
 
-import java.util.ArrayList;
-import java.util.List;
+import ru.spbau.sd.model.framework.FieldDescriptorsFactory;
+import ru.spbau.sd.model.framework.FieldGeometry;
+import ru.spbau.sd.model.framework.FieldStringSerializer;
 
-import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.framework.FieldObject;
+public class SquareFieldDescriptorsFactory implements FieldDescriptorsFactory {
 
-public class Light extends FieldObject {
-
-    public Light(int x, int y) {
-        super(x, y);
-    }
-
-    public List<FieldObject> getLightedFieldObjects() {
-        List<FieldObject> lightedObjects = new ArrayList<>();
-        for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
-            if (Field.getInstance().getGeometry().isInsideCircle(getX(), getY(), 3, fo)) {
-                lightedObjects.add(fo);
-            }
-        }
-        return lightedObjects;
-    }
+    private SquareFieldGeometry sfg = new SquareFieldGeometry();
+    private SquareFieldStringSerializer sfss = new SquareFieldStringSerializer();
     
-    @Override public char getSingleCharDescription() { return 'L'; }
+    @Override
+    public FieldGeometry getFieldGeometry() { return sfg; }
+
+    @Override
+    public FieldStringSerializer getFieldStringSerializer() { return sfss; }
 
 }

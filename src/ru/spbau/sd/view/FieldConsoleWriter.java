@@ -23,40 +23,17 @@
 package ru.spbau.sd.view;
 
 import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.framework.FieldObject;
-import ru.spbau.sd.model.framework.GameObject;
+
 
 /**
  * Prints field to console
  * 
  * @author Artur Huletski (hatless.fox@gmail.com)
  */
-public class FileldConsoleWriter {
+public class FieldConsoleWriter {
 
     public static void printField() {
-        char filedProg[][] = new char[Field.getInstance().getXBound()+2][Field.getInstance().getYBound()+2]; 
-        
-        //round rectangle is for outer objects
-        for (int i = -1; i < Field.getInstance().getXBound() + 1; i++) {
-            for (int j = -1; j < Field.getInstance().getYBound() + 1; j ++) {
-                filedProg[i+1][j+1] = Field.getInstance().isInsideField(i, j) ? '.' : ' ';
-            }
-        }
-        
-        
-        for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
-            filedProg[fo.getY()+1][fo.getX()+1] = fo.getSingleCharDescription();
-        }
-        for (GameObject go : Field.getInstance().getOutsideObjects()) {
-            filedProg[go.getY()+1][go.getX()+1] = go.getSingleCharDescription();
-        }
-        
-        for (int i = 0; i < Field.getInstance().getYBound()+2; i++) {
-            for (int j = 0; j < Field.getInstance().getXBound()+2; j ++) {
-                System.out.print(filedProg[i][j]);
-            }
-            System.out.println();
-        }
+        System.out.print(Field.getInstance().toString());
     }
     
 }

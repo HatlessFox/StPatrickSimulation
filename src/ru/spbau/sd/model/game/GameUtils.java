@@ -36,8 +36,8 @@ final public class GameUtils {
     
     
     private static int [][] getMap(Class<?>... ignoredObstacles) {
-        int x_dem = Field.getInstance().getXBound();
-        int y_dem = Field.getInstance().getYBound();
+        int x_dem = Field.getInstance().getXBound() + 2;
+        int y_dem = Field.getInstance().getYBound() + 2;
         
         int[][] map = new int[x_dem][y_dem];
         Set<Class<?>> ignoredObst = new HashSet<Class<?>>();
@@ -45,7 +45,7 @@ final public class GameUtils {
         
         for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
             if (ignoredObst.contains(fo.getClass())) { continue; }
-            map[fo.getX()][fo.getY()] = Integer.MAX_VALUE;
+            map[fo.getX()+1][fo.getY()+1] = Integer.MAX_VALUE;
         }
         return map;
     }
@@ -87,14 +87,14 @@ final public class GameUtils {
         public Point2D next_step = null;
         public DestinationNeighborHandler(int[][] pMap, Point2D point) {
             super(pMap);
-            x = point.x;
-            y = point.y;
+            x = point.x + 1;
+            y = point.y + 1;
         }
         
         @Override
         void handleNeighbor(int i, int j) {
             if (map[i][j] + 1 == map[x][y]) {
-                next_step =  new Point2D(i, j);
+                next_step =  new Point2D(i-1, j-1);
             }
         }
         
@@ -104,7 +104,7 @@ final public class GameUtils {
         for (int i = nh.x - 1; i < nh.x + 2; i++) {
             for (int j = nh.y - 1; j < nh.y + 2; j++) {
                 if (!Field.arePointsNear(i, j, nh.x, nh.y)) { continue; }
-                if (!Field.getInstance().isInsideField(i, j)) { continue; }
+                if (!Field.getInstance().isInsideField(i-1, j-1)) { continue; }
                 nh.handleNeighbor(i, j);
             }
         }
@@ -114,12 +114,12 @@ final public class GameUtils {
         if (Field.arePointsNear(start, end)) { return end; }
         
         int[][] map = getMap(ignoredObstacles);
-        map[start.x][start.y] = 0; 
-        map[end.x][end.y] = 0;
+        map[start.x+1][start.y+1] = 0; 
+        map[end.x+1][end.y+1] = 0;
         
         Queue<Integer> points_to_go = new LinkedList<>();
-        points_to_go.add(end.x);
-        points_to_go.add(end.y);
+        points_to_go.add(end.x+1);
+        points_to_go.add(end.y+1);
         
         CommonBfsNeighborHandler bfsH = new CommonBfsNeighborHandler(points_to_go, map);
         DestinationNeighborHandler destH = new DestinationNeighborHandler(map, start);
@@ -128,7 +128,7 @@ final public class GameUtils {
             int curr_x = points_to_go.poll();
             int curr_y = points_to_go.poll();
             
-            if (curr_x == start.x && curr_y == start.y) {
+            if (curr_x == start.x+1 && curr_y == start.y+1) {
                 processNeighbors(destH);
                 break;
             }

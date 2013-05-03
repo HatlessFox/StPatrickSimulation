@@ -48,10 +48,11 @@ public class MumperHouse extends GameObject implements EndTurnListener {
     public void handleEndTurn() {
         if (mumperOut == null) {
             if (turnsToGo == 0 && Field.getInstance().isPosFree(entryPoint)) {
-                mumperOut = new Mumper(entryPoint.x, entryPoint.y, entryPoint);
+                mumperOut = new Mumper(entryPoint.x, entryPoint.y, new Point2D(getX(), getY()));
+                
                 Field.getInstance().addMovable(mumperOut);
             } else {
-                turnsToGo = 0;
+                turnsToGo--;
             }
         } else {
             if (mumperOut.isOnSamePosition(entryPoint) && mumperOut.hasBottleBeenFound()) {

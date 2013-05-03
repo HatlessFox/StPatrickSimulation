@@ -86,7 +86,7 @@ public class Policeman extends MovableObject {
         
         
         Point2D destPoint = isBadGuyCaught() || isGoingHome() ?
-           new Point2D(mPoliceStation.getEntryX(), mPoliceStation.getEntryY()) :
+           new Point2D(mPoliceStation.getX(), mPoliceStation.getY()) :
            new Point2D(mBadGuy.getX(), mBadGuy.getY());
        
         Point2D nextStep = GameUtils.lookUpNextStep(policemanPos, destPoint);

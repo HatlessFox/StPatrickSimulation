@@ -20,30 +20,11 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd.model.game;
+package ru.spbau.sd.model.framework;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.framework.FieldObject;
-
-public class Light extends FieldObject {
-
-    public Light(int x, int y) {
-        super(x, y);
-    }
-
-    public List<FieldObject> getLightedFieldObjects() {
-        List<FieldObject> lightedObjects = new ArrayList<>();
-        for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
-            if (Field.getInstance().getGeometry().isInsideCircle(getX(), getY(), 3, fo)) {
-                lightedObjects.add(fo);
-            }
-        }
-        return lightedObjects;
-    }
-    
-    @Override public char getSingleCharDescription() { return 'L'; }
-
+public interface FieldGeometry {
+    public boolean arePointsNear(int x1, int y1, int x2, int y2);
+    public int getNeighborCnt();
+    public Point2D getNeighborByDir(int dir, int baseX, int baseY);
+    public boolean isInsideCircle(int cX, int cY, int rad, FieldObject fo);
 }

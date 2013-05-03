@@ -20,30 +20,25 @@
   OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package ru.spbau.sd.model.game;
-
-import java.util.ArrayList;
-import java.util.List;
+package ru.spbau.sd.field.sq;
 
 import ru.spbau.sd.model.framework.Field;
-import ru.spbau.sd.model.framework.FieldObject;
+import ru.spbau.sd.model.framework.FieldStringSerializer;
 
-public class Light extends FieldObject {
+public class SquareFieldStringSerializer implements FieldStringSerializer{
 
-    public Light(int x, int y) {
-        super(x, y);
-    }
-
-    public List<FieldObject> getLightedFieldObjects() {
-        List<FieldObject> lightedObjects = new ArrayList<>();
-        for (FieldObject fo : Field.getInstance().getAllFieldObjects()) {
-            if (Field.getInstance().getGeometry().isInsideCircle(getX(), getY(), 3, fo)) {
-                lightedObjects.add(fo);
+    @Override
+    public String serializeField(Field field) {
+        StringBuilder sb = new StringBuilder();
+        
+        char[][] tableView = Field.getInstance().getTableView();
+        for (int i = 0; i < Field.getInstance().getYBound()+2; i++) {
+            for (int j = 0; j < Field.getInstance().getXBound()+2; j ++) {
+                sb.append(tableView[i][j]);
             }
+            sb.append('\n');
         }
-        return lightedObjects;
+        return sb.toString();
     }
-    
-    @Override public char getSingleCharDescription() { return 'L'; }
 
 }

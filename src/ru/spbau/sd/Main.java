@@ -25,14 +25,17 @@ package ru.spbau.sd;
 import java.util.HashSet;
 import java.util.Set;
 
+import ru.spbau.sd.field.hex.HexFieldDescriptorsFactory;
+import ru.spbau.sd.field.sq.SquareFieldDescriptorsFactory;
 import ru.spbau.sd.model.framework.Field;
+import ru.spbau.sd.model.framework.FieldDescriptorsFactory;
 import ru.spbau.sd.model.game.Column;
 import ru.spbau.sd.model.game.Drinker;
 import ru.spbau.sd.model.game.Light;
 import ru.spbau.sd.model.game.MumperHouse;
 import ru.spbau.sd.model.game.PoliceStation;
 import ru.spbau.sd.model.game.Tavern;
-import ru.spbau.sd.view.FileldConsoleWriter;
+import ru.spbau.sd.view.FieldConsoleWriter;
 
 /**
  * Main app class
@@ -53,7 +56,10 @@ public class Main {
    
     public static void main(String[] args) {
         //Setting up game stuff
-        Field.init(15, 15);
+        FieldDescriptorsFactory fdf = args.length != 0 && args[0] == "sq" ?
+                new SquareFieldDescriptorsFactory() :
+                new HexFieldDescriptorsFactory();
+        Field.init(15, 15, fdf);
         
         Field.getInstance().addMovable(new Drinker(0, 0));
         Field.getInstance().addStationary(new Column(7, 7));
@@ -73,7 +79,7 @@ public class Main {
         for (int i = 1; i <= NUMBER_OF_TRIALS; i++) {
             Field.getInstance().simulateRound();
             if (sTrialsToBeShown.isEmpty() || sTrialsToBeShown.contains(i)) {
-                FileldConsoleWriter.printField();
+                FieldConsoleWriter.printField();
             }
             Field.getInstance().handleEndTurn();
             

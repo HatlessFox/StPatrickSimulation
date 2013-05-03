@@ -25,6 +25,7 @@ package ru.spbau.sd.model.game;
 import java.util.Random;
 
 import ru.spbau.sd.model.framework.Field;
+import ru.spbau.sd.model.framework.FieldGeometry;
 import ru.spbau.sd.model.framework.FieldObject;
 import ru.spbau.sd.model.framework.InteractionStrategy;
 import ru.spbau.sd.model.framework.MovableObject;
@@ -56,15 +57,8 @@ public class Drinker extends MovableObject {
           private Random rnd = new Random();
           @Override
           public Point2D makeMove(FieldObject obj) {
-              boolean isXChanged = rnd.nextBoolean();
-              int delta = rnd.nextBoolean() ? 1 : -1;
-              
-              Point2D newPos = new Point2D(obj.getX(), obj.getY());
-              
-              if (isXChanged) { newPos.x += delta; }
-              else { newPos.y += delta; }
-              
-              return newPos;
+              FieldGeometry fg = Field.getInstance().getGeometry();
+              return fg.getNeighborByDir(rnd.nextInt(fg.getNeighborCnt()), obj.getX(), obj.getY());
           }
           @Override
           public char getSingleCharRepr() { return 'D'; }

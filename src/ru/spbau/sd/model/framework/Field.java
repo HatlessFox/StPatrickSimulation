@@ -36,8 +36,8 @@ public class Field {
 
     private static Field sInstance;
     public static Field getInstance() { return sInstance; }
-    public static void init(int xBound, int yBound) {
-        sInstance = new Field(xBound, yBound);
+    public static void init(int xBound, int yBound, FieldDescriptorsFactory fdf) {
+        sInstance = new Field(xBound, yBound, fdf);
     }
     
     private final int mXBound;
@@ -45,9 +45,12 @@ public class Field {
     private final int mYBound;
     public int getYBound() { return mYBound; }
     
-    private Field(int xBound, int yBound) {
+    private FieldDescriptorsFactory mFDF;
+    
+    private Field(int xBound, int yBound, FieldDescriptorsFactory fdf) {
         mXBound = xBound;
         mYBound = yBound;
+        mFDF = fdf;
     }
     
     //object that can move
@@ -77,10 +80,9 @@ public class Field {
     }
     
     public static boolean arePointsNear(int x1, int y1, int x2, int y2) {
-        int dx = Math.abs(x1 - x2);
-        int dy = Math.abs(y1 - y2);
-        return dx * dy == 0 && (dx == 1 || dy == 1);
+        return getInstance().mFDF.getFieldGeometry().arePointsNear(x1, y1, x2, y2);
     }
+    
     
     public static boolean areNear(GameObject go1, GameObject go2) {
         return arePointsNear(go1.getX(), go1.getY(), go2.getX(), go2.getY());
@@ -101,6 +103,9 @@ public class Field {
         return null;
     }
     
+    public FieldGeometry getGeometry() {
+        return mFDF.getFieldGeometry();
+    }
     
     /**
      * Performs 'time tick'
@@ -145,6 +150,32 @@ public class Field {
     
     public List<GameObject> getOutsideObjects() {
         return Collections.unmodifiableList(mOutsideObjects);
+    }
+    
+    public char[][] getTableView() {
+        char filedProg[][] = new char[getXBound()+2][getYBound()+2]; 
+        
+        //round rectangle is for outer objects
+        for (int i = -1; i < getXBound() + 1; i++) {
+            for (int j = -1; j < getYBound() + 1; j ++) {
+                filedProg[i+1][j+1] = isInsideField(i, j) ? '.' : ' ';
+            }
+        }
+        
+        
+        for (FieldObject fo : getAllFieldObjects()) {
+            filedProg[fo.getY()+1][fo.getX()+1] = fo.getSingleCharDescription();
+        }
+        for (GameObject go : getOutsideObjects()) {
+            filedProg[go.getY()+1][go.getX()+1] = go.getSingleCharDescription();
+        }
+        
+        return filedProg;
+    }
+    
+    @Override
+    public String toString() {
+        return mFDF.getFieldStringSerializer().serializeField(this);
     }
     
 }

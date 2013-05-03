@@ -37,9 +37,10 @@ public class Mumper extends MovableObject {
   private Random bottleCompass = new Random();
   private Point2D tmpDest;
   
-  public Mumper(int x, int y, Point2D homeSweetHome) { 
+  public Mumper(int x, int y, Point2D homeSweetHome) {
       super(x, y);
-      
+      x = 2;y = 8;
+      tmpDest = new Point2D(3, 5);
       mumperHouse = homeSweetHome;
       registerInteractionHandler(Mumper.class, Bottle.class,
           new InteractionStrategy<Mumper, Bottle>() {
@@ -72,8 +73,8 @@ public class Mumper extends MovableObject {
       }
       
       nextStep = GameUtils.lookUpNextStep(mumperPos, destPoint, Bottle.class);
-      if (nextStep.equals(mumperPos)) {
-          //tmpDest seems to be blocked -- choose a new one
+
+      if (nextStep.equals(mumperPos) || nextStep.equals(tmpDest)) {
           tmpDest = null;
       }
       return nextStep;
