@@ -112,7 +112,7 @@ public class PoliceStation extends Generator implements EndTurnListener {
                 }
             }
         }
-        if (drinkerToBeCaught == null) { return; }
+        if (drinkerToBeCaught == null || choosenEntryPoint == null) { return; }
         
         Policeman p = mWaitingOfficers.remove(mWaitingOfficers.size() - 1);
         
